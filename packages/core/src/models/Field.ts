@@ -60,6 +60,8 @@ import {
 } from '../shared'
 import { Query } from './Query'
 
+const RESPONSE_REQUEST_DURATION = 100
+
 export class Field<
   Decorator extends JSXComponent = any,
   Component extends JSXComponent = any,
@@ -101,12 +103,13 @@ export class Field<
   constructor(
     address: FormPathPattern,
     props: IFieldProps<Decorator, Component, TextType, ValueType>,
-    form: Form
+    form: Form,
+    controlled: boolean
   ) {
     this.initialize(props, form)
     this.makeIndexes(address)
-    this.makeObservable()
-    this.makeReactive()
+    this.makeObservable(controlled)
+    this.makeReactive(controlled)
     this.onInit()
   }
 
@@ -148,7 +151,8 @@ export class Field<
     this.component = toArr(this.props.component)
   }
 
-  protected makeObservable() {
+  protected makeObservable(controlled: boolean) {
+    if (controlled) return
     define(this, {
       title: observable.ref,
       description: observable.ref,
@@ -169,8 +173,8 @@ export class Field<
       componentType: observable.ref,
       decoratorProps: observable,
       componentProps: observable,
-      validator: observable,
-      feedbacks: observable,
+      validator: observable.shallow,
+      feedbacks: observable.shallow,
       component: observable.computed,
       decorator: observable.computed,
       errors: observable.computed,
@@ -219,12 +223,16 @@ export class Field<
     })
   }
 
-  protected makeReactive() {
+  protected makeReactive(controlled: boolean) {
+    if (controlled) return
     this.disposers.push(
       reaction(
         () => this.value,
-        () => {
+        (value) => {
           this.form.notify(LifeCycleTypes.ON_FIELD_VALUE_CHANGE, this)
+          if (isValid(value) && this.modified && !this.caches.inputing) {
+            this.validate()
+          }
         }
       ),
       reaction(
@@ -578,26 +586,28 @@ export class Field<
   }
 
   setLoading = (loading?: boolean) => {
-    clearTimeout(this.requests.loader)
+    clearTimeout(this.requests.loading)
     if (loading) {
-      this.requests.loader = setTimeout(() => {
+      this.requests.loading = setTimeout(() => {
         batch(() => {
           this.loading = loading
+          this.form.notify(LifeCycleTypes.ON_FIELD_LOADING, this)
         })
-      }, 100)
+      }, RESPONSE_REQUEST_DURATION)
     } else if (this.loading !== loading) {
       this.loading = loading
     }
   }
 
   setValidating = (validating?: boolean) => {
-    clearTimeout(this.requests.validate)
+    clearTimeout(this.requests.validating)
     if (validating) {
-      this.requests.validate = setTimeout(() => {
+      this.requests.validating = setTimeout(() => {
         batch(() => {
           this.validating = validating
+          this.form.notify(LifeCycleTypes.ON_FIELD_VALIDATING, this)
         })
-      }, 100)
+      }, RESPONSE_REQUEST_DURATION)
     } else if (this.validating !== validating) {
       this.validating = validating
     }
@@ -680,6 +690,7 @@ export class Field<
     }
     const values = getValuesFromEvent(args)
     const value = values[0]
+    this.caches.inputing = true
     this.inputValue = value
     this.inputValues = values
     this.value = value
@@ -688,6 +699,7 @@ export class Field<
     this.form.notify(LifeCycleTypes.ON_FIELD_INPUT_VALUE_CHANGE, this)
     this.form.notify(LifeCycleTypes.ON_FORM_INPUT_CHANGE, this.form)
     await this.validate('onInput')
+    this.caches.inputing = false
   }
 
   onFocus = async (...args: any[]) => {

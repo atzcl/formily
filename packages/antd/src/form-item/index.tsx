@@ -3,7 +3,7 @@ import cls from 'classnames'
 import { usePrefixCls } from '../__builtins__'
 import { isVoidField } from '@formily/core'
 import { connect, mapProps } from '@formily/react'
-import { useFormLayout } from '../form-layout'
+import { useFormLayout, FormLayoutShallowContext } from '../form-layout'
 import { useGridSpan } from '../form-grid'
 import { Tooltip, Popover } from 'antd'
 import {
@@ -268,10 +268,13 @@ export const BaseItem: React.FC<IFormItemProps> = (props) => {
             style={wrapperStyle}
             className={cls({
               [`${prefixCls}-control-content-component`]: true,
-              [`${prefixCls}-control-content-component-has-feedback-icon`]: !!feedbackIcon,
+              [`${prefixCls}-control-content-component-has-feedback-icon`]:
+                !!feedbackIcon,
             })}
           >
-            {formatChildren}
+            <FormLayoutShallowContext.Provider value={undefined}>
+              {formatChildren}
+            </FormLayoutShallowContext.Provider>
             {feedbackIcon && (
               <div className={cls(`${prefixCls}-feedback-icon`)}>
                 {feedbackIcon}

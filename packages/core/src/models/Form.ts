@@ -40,6 +40,7 @@ import {
   IFieldStateGetter,
   IFieldStateSetter,
   FormDisplayTypes,
+  IFormMergeStrategy,
 } from '../types'
 import {
   isVoidField,
@@ -57,6 +58,8 @@ import { Query } from './Query'
 import { Graph } from './Graph'
 
 const DEV_TOOLS_HOOK = '__FORMILY_DEV_TOOLS_HOOK__'
+
+const RESPONSE_REQUEST_DURATION = 100
 
 export class Form<ValueType extends object = any> {
   displayName = 'Form'
@@ -122,6 +125,7 @@ export class Form<ValueType extends object = any> {
   }
 
   protected makeObservable() {
+    if (this.props.controlled) return
     define(this, {
       fields: observable.shallow,
       initialized: observable.ref,
@@ -165,6 +169,7 @@ export class Form<ValueType extends object = any> {
   }
 
   protected makeReactive() {
+    if (this.props.controlled) return
     this.disposers.push(
       observe(this.initialValues, (change) => {
         if (change.type === 'add' || change.type === 'set') {
@@ -297,9 +302,14 @@ export class Form<ValueType extends object = any> {
     const address = FormPath.parse(props.basePath).concat(props.name)
     const identifier = address.toString()
     if (!identifier) return
-    if (!this.fields[identifier]) {
+    if (!this.fields[identifier] || this.props.controlled) {
       batch(() => {
-        this.fields[identifier] = new Field(address, props, this)
+        this.fields[identifier] = new Field(
+          address,
+          props,
+          this,
+          this.props.controlled
+        )
       })
       this.notify(LifeCycleTypes.ON_FORM_GRAPH_CHANGE)
     }
@@ -315,9 +325,14 @@ export class Form<ValueType extends object = any> {
     const address = FormPath.parse(props.basePath).concat(props.name)
     const identifier = address.toString()
     if (!identifier) return
-    if (!this.fields[identifier]) {
+    if (!this.fields[identifier] || this.props.controlled) {
       batch(() => {
-        this.fields[identifier] = new ArrayField(address, props, this)
+        this.fields[identifier] = new ArrayField(
+          address,
+          props,
+          this,
+          this.props.controlled
+        )
       })
       this.notify(LifeCycleTypes.ON_FORM_GRAPH_CHANGE)
     }
@@ -333,9 +348,14 @@ export class Form<ValueType extends object = any> {
     const address = FormPath.parse(props.basePath).concat(props.name)
     const identifier = address.toString()
     if (!identifier) return
-    if (!this.fields[identifier]) {
+    if (!this.fields[identifier] || this.props.controlled) {
       batch(() => {
-        this.fields[identifier] = new ObjectField(address, props, this)
+        this.fields[identifier] = new ObjectField(
+          address,
+          props,
+          this,
+          this.props.controlled
+        )
       })
       this.notify(LifeCycleTypes.ON_FORM_GRAPH_CHANGE)
     }
@@ -351,9 +371,14 @@ export class Form<ValueType extends object = any> {
     const address = FormPath.parse(props.basePath).concat(props.name)
     const identifier = address.toString()
     if (!identifier) return
-    if (!this.fields[identifier]) {
+    if (!this.fields[identifier] || this.props.controlled) {
       batch(() => {
-        this.fields[identifier] = new VoidField(address, props, this)
+        this.fields[identifier] = new VoidField(
+          address,
+          props,
+          this,
+          this.props.controlled
+        )
       })
       this.notify(LifeCycleTypes.ON_FORM_GRAPH_CHANGE)
     }
@@ -362,11 +387,13 @@ export class Form<ValueType extends object = any> {
 
   /** 状态操作模型 **/
 
-  setValues = (values: any, strategy: 'overwrite' | 'merge' = 'merge') => {
+  setValues = (values: any, strategy: IFormMergeStrategy = 'merge') => {
     if (!isPlainObj(values)) return
     untracked(() => {
-      if (strategy === 'merge') {
+      if (strategy === 'merge' || strategy === 'deepMerge') {
         this.values = defaults(this.values, values)
+      } else if (strategy === 'shallowMerge') {
+        this.values = Object.assign(this.values, values)
       } else {
         this.values = values as any
       }
@@ -375,12 +402,14 @@ export class Form<ValueType extends object = any> {
 
   setInitialValues = (
     initialValues: any,
-    strategy: 'overwrite' | 'merge' = 'merge'
+    strategy: IFormMergeStrategy = 'merge'
   ) => {
     if (!isPlainObj(initialValues)) return
     untracked(() => {
-      if (strategy === 'merge') {
+      if (strategy === 'merge' || strategy === 'deepMerge') {
         this.initialValues = defaults(this.initialValues, initialValues)
+      } else if (strategy === 'shallowMerge') {
+        this.initialValues = Object.assign(this.initialValues, initialValues)
       } else {
         this.initialValues = initialValues as any
       }
@@ -433,8 +462,9 @@ export class Form<ValueType extends object = any> {
       this.requests.submit = setTimeout(() => {
         batch(() => {
           this.submitting = submitting
+          this.notify(LifeCycleTypes.ON_FORM_SUBMITTING)
         })
-      }, 100)
+      }, RESPONSE_REQUEST_DURATION)
       this.notify(LifeCycleTypes.ON_FORM_SUBMIT_START)
     } else {
       if (this.submitting !== submitting) {
@@ -450,8 +480,9 @@ export class Form<ValueType extends object = any> {
       this.requests.validate = setTimeout(() => {
         batch(() => {
           this.validating = validating
+          this.notify(LifeCycleTypes.ON_FORM_VALIDATING)
         })
-      }, 100)
+      }, RESPONSE_REQUEST_DURATION)
       this.notify(LifeCycleTypes.ON_FORM_VALIDATE_START)
     } else {
       if (this.validating !== validating) {

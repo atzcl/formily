@@ -21,29 +21,30 @@ export interface IFormLayoutProps {
   direction?: 'rtl' | 'ltr'
   inset?: boolean
   shallow?: boolean
-  feedbackLayout?: 'loose' | 'terse' | 'popover' | 'none'
   tooltipLayout?: 'icon' | 'text'
+  feedbackLayout?: 'loose' | 'terse' | 'popover' | 'none'
   bordered?: boolean
 }
 
-export const FormLayoutContext = createContext<IFormLayoutProps>({})
+export const FormLayoutDeepContext = createContext<IFormLayoutProps>(null)
 
-export const useFormLayout = () => useContext(FormLayoutContext)
+export const FormLayoutShallowContext = createContext<IFormLayoutProps>(null)
+
+export const useFormDeepLayout = () => useContext(FormLayoutDeepContext)
+
+export const useFormShallowLayout = () => useContext(FormLayoutShallowContext)
+
+export const useFormLayout = () => ({
+  ...useFormDeepLayout(),
+  ...useFormShallowLayout(),
+})
 
 export const FormLayout: React.FC<IFormLayoutProps> & {
   useFormLayout: () => IFormLayoutProps
+  useFormDeepLayout: () => IFormLayoutProps
+  useFormShallowLayout: () => IFormLayoutProps
 } = ({ shallow, children, prefix, className, style, ...props }) => {
-  const parentLayout = useFormLayout()
-  const providerValue = shallow
-    ? {
-        size: parentLayout.size,
-        ...props,
-      }
-    : {
-        ...parentLayout,
-        ...props,
-      }
-
+  const deepLayout = useFormDeepLayout()
   const formPrefixCls = usePrefixCls('form')
   const layoutPrefixCls = usePrefixCls('formily-layout', { prefix })
   const layoutClassName = cls(
@@ -55,12 +56,31 @@ export const FormLayout: React.FC<IFormLayoutProps> & {
     },
     className
   )
-
+  const renderChildren = () => {
+    const newDeepLayout = {
+      ...deepLayout,
+    }
+    if (!shallow) {
+      Object.assign(newDeepLayout, props)
+    } else {
+      if (props.size) {
+        newDeepLayout.size = props.size
+      }
+      if (props.colon) {
+        newDeepLayout.colon = props.colon
+      }
+    }
+    return (
+      <FormLayoutDeepContext.Provider value={newDeepLayout}>
+        <FormLayoutShallowContext.Provider value={shallow ? props : undefined}>
+          {children}
+        </FormLayoutShallowContext.Provider>
+      </FormLayoutDeepContext.Provider>
+    )
+  }
   return (
     <div className={layoutClassName} style={style}>
-      <FormLayoutContext.Provider value={providerValue}>
-        {children}
-      </FormLayoutContext.Provider>
+      {renderChildren()}
     </div>
   )
 }
@@ -69,6 +89,8 @@ FormLayout.defaultProps = {
   shallow: true,
 }
 
+FormLayout.useFormDeepLayout = useFormDeepLayout
+FormLayout.useFormShallowLayout = useFormShallowLayout
 FormLayout.useFormLayout = useFormLayout
 
 export default FormLayout

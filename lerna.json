@@ -1,6 +1,7 @@
 {
   "packages": [
-    "packages/*"
+    "packages/*",
+    "designable/*"
   ],
   "version": "independent",
   "npmClient": "yarn",
@@ -9,10 +10,10 @@
     "--ignore-engines"
   ],
   "command": {
-    "publish": {
-      "ignoreChanges": [
-        "*.md"
-      ]
+    "version": {
+      "forcePublish": "@formily/*",
+      "exact": true,
+      "message": "chore(versions): publish packages %s"
     }
   }
 }

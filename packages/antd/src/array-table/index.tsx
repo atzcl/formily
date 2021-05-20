@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useRef, useContext } from 'react'
+import React, { Fragment, useState, useRef } from 'react'
 import { Table, Pagination, Space, Select, Badge } from 'antd'
 import { PaginationProps } from 'antd/lib/pagination'
 import { TableProps, ColumnProps } from 'antd/lib/table'
@@ -11,7 +11,6 @@ import {
   observer,
   useFieldSchema,
   RecursionField,
-  SchemaOptionsContext
 } from '@formily/react'
 import { FormPath, isArr, isBool } from '@formily/shared'
 import { Schema } from '@formily/json-schema'
@@ -20,7 +19,6 @@ import { ArrayBase, ArrayBaseMixins } from '../array-base'
 
 interface ObservableColumnSource {
   field: Formily.Core.Types.GeneralField
-  fieldProps: Formily.Core.Types.IVoidFieldFactoryProps<any, any>
   columnProps: ColumnProps<any>
   schema: Schema
   display: Formily.Core.Types.FieldDisplayTypes
@@ -61,7 +59,6 @@ const isAdditionComponent = (schema: Schema) => {
 const useArrayTableSources = () => {
   const arrayField = useField()
   const schema = useFieldSchema()
-  const options = useContext(SchemaOptionsContext)
   const parseSources = (schema: Schema): ObservableColumnSource[] => {
     if (
       isColumnComponent(schema) ||
@@ -72,7 +69,6 @@ const useArrayTableSources = () => {
         return []
       const name = schema['x-component-props']?.['dataIndex'] || schema['name']
       const field = arrayField.query(arrayField.address.concat(name)).take()
-      const fieldProps = field?.props || schema.toFieldProps(options)
       const columnProps =
         field?.component?.[1] || schema['x-component-props'] || {}
       const display = field?.display || schema['x-display']
@@ -81,7 +77,6 @@ const useArrayTableSources = () => {
           name,
           display,
           field,
-          fieldProps,
           schema,
           columnProps,
         },
