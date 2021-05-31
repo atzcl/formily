@@ -3,7 +3,7 @@ import baseConfig, {
 } from '../../scripts/rollup.base.js'
 
 export default baseConfig(
-  'formily.designable.next',
-  'Formily.Designable.Next',
+  'formily.designable.setters',
+  'Formily.Designable.Setters',
   removeImportStyleFromInputFilePlugin()
 )

@@ -71,6 +71,7 @@ export type SchemaReaction<Field = any> =
         schema?: ISchema
         run?: string
       }
+      [key: string]: any
     }
   | ((field: Field) => void)
 
@@ -129,7 +130,10 @@ export interface ISchemaTransformerOptions extends ISchemaFieldFactoryOptions {
 }
 
 export type Stringify<P extends { [key: string]: any }> = {
-  [key in keyof P]?: P[key] | string
+  /**
+   * Use `string & {}` instead of string to keep Literal Type for ISchema#component and ISchema#decorator
+   */
+  [key in keyof P]?: P[key] | (string & {})
 }
 
 export type ISchema<
@@ -168,7 +172,18 @@ export type ISchema<
   minProperties?: number
   required?: string[] | boolean | string
   format?: string
+  $ref?: string
   /** nested json schema spec **/
+  definitions?: SchemaProperties<
+    Decorator,
+    Component,
+    DecoratorProps,
+    ComponentProps,
+    Pattern,
+    Display,
+    Validator,
+    Message
+  >
   properties?: SchemaProperties<
     Decorator,
     Component,

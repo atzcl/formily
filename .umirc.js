@@ -1,7 +1,6 @@
 export default {
   mode: 'site',
-  logo:
-    '//img.alicdn.com/imgextra/i2/O1CN01Kq3OHU1fph6LGqjIz_!!6000000004056-55-tps-1141-150.svg',
+  logo: '//img.alicdn.com/imgextra/i2/O1CN01Kq3OHU1fph6LGqjIz_!!6000000004056-55-tps-1141-150.svg',
   title: 'Formily',
   hash: true,
   favicon:
@@ -64,8 +63,7 @@ export default {
           },
           {
             title: 'Chrome Extension',
-            path:
-              'https://chrome.google.com/webstore/detail/formily-devtools/kkocalmbfnplecdmbadaapgapdioecfm?hl=zh-CN',
+            path: 'https://chrome.google.com/webstore/detail/formily-devtools/kkocalmbfnplecdmbadaapgapdioecfm?hl=zh-CN',
           },
         ],
       },
@@ -140,8 +138,7 @@ export default {
           },
           {
             title: 'Chrome扩展',
-            path:
-              'https://chrome.google.com/webstore/detail/formily-devtools/kkocalmbfnplecdmbadaapgapdioecfm?hl=zh-CN',
+            path: 'https://chrome.google.com/webstore/detail/formily-devtools/kkocalmbfnplecdmbadaapgapdioecfm?hl=zh-CN',
           },
         ],
       },
@@ -165,6 +162,12 @@ export default {
       },
     ],
   },
+  links: [
+    {
+      rel: 'stylesheet',
+      href: 'https://unpkg.com/antd/dist/antd.css',
+    },
+  ],
   styles: [
     `.__dumi-default-navbar-logo{
       height: 60px !important;
@@ -202,6 +205,14 @@ export default {
       {
         title: 'V2 Upgrade Guide',
         path: '/guide/upgrade',
+      },
+      {
+        title: 'Contribution Guide',
+        path: '/guide/contribution',
+      },
+      {
+        title: 'Issue Helper',
+        path: '/guide/issue-helper',
       },
       {
         title: 'Scenes',
@@ -281,11 +292,6 @@ export default {
           },
         ],
       },
-
-      {
-        title: 'Contribution Guide',
-        path: '/guide/contribution',
-      },
     ],
 
     '/zh-CN/guide': [
@@ -304,6 +310,14 @@ export default {
       {
         title: 'V2升级指南',
         path: '/zh-CN/guide/upgrade',
+      },
+      {
+        title: '贡献指南',
+        path: '/zh-CN/guide/contribution',
+      },
+      {
+        title: '问题反馈',
+        path: '/zh-CN/guide/issue-helper',
       },
       {
         title: '场景案例',
@@ -382,11 +396,6 @@ export default {
             path: '/zh-CN/guide/advanced/build',
           },
         ],
-      },
-
-      {
-        title: '贡献指南',
-        path: '/zh-CN/guide/contribution',
       },
     ],
   },

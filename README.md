@@ -2,6 +2,7 @@ English | [简体中文](./README.zh-cn.md)
 
 <p align="center">
 <img src="https://img.alicdn.com/tfs/TB1fHhZu4D1gK0jSZFyXXciOVXa-2500-1200.png">
+<img src="https://img.shields.io/npm/dy/@formily/core"/>
 <a href="https://www.npmjs.com/package/@formily/core"><img src="https://img.shields.io/npm/v/@formily/core.svg"></a>
 <a href="https://www.npmjs.com/package/@formily/react"><img src="https://img.shields.io/npm/v/@formily/react.svg"></a>
 <a href="https://travis-ci.com/alibaba/formily"><img src="https://travis-ci.com/alibaba/formily.svg?branch=master"></a>
@@ -23,13 +24,23 @@ In React, the whole tree rendering performance problem of the form is very obvio
 - 🏅 Side effects are managed independently, making form data linkages easier than ever before.
 - 🌯 Override most complicated form layout use cases.
 
-## Documents
+## WebSite
 
-- [formilyjs.org](https://formilyjs.org)
+2.0
+
+https://v2.formilyjs.org
+
+1.0
+
+https://formilyjs.org
 
 ## Community
 
 - [icejs](https://github.com/alibaba/ice)
+
+## How to contribute?
+
+- [Contribute document](https://v2.formilyjs.org/zh-CN/guide/contribution)
 
 ## Contributors
 

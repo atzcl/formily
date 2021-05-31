@@ -24,35 +24,35 @@ export default defineComponent<IFieldProps<VueComponent, VueComponent>>({
     pattern: String,
     required: {
       type: Boolean,
-      default: undefined
+      default: undefined,
     },
     validateFirst: {
       type: Boolean,
-      default: undefined
+      default: undefined,
     },
     hidden: {
       type: Boolean,
-      default: undefined
+      default: undefined,
     },
     visible: {
       type: Boolean,
-      default: undefined
+      default: undefined,
     },
     editable: {
       type: Boolean,
-      default: undefined
+      default: undefined,
     },
     disabled: {
       type: Boolean,
-      default: undefined
+      default: undefined,
     },
     readOnly: {
       type: Boolean,
-      default: undefined
+      default: undefined,
     },
     readPretty: {
       type: Boolean,
-      default: undefined
+      default: undefined,
     },
     dataSource: {},
     validator: {},
@@ -62,32 +62,38 @@ export default defineComponent<IFieldProps<VueComponent, VueComponent>>({
     // const { track } = useObserver()
     const formRef = useForm()
     const parentRef = useField()
-    const basePath = props.basePath !== undefined ? props.basePath : parentRef?.value?.address
-    const fieldRef = useAttach(() => formRef.value.createField({
-      ...props,
-      basePath,
-      ...getRawComponent(props)
-    }), [() => props.name, formRef])
+    const basePath =
+      props.basePath !== undefined ? props.basePath : parentRef?.value?.address
+    const fieldRef = useAttach(
+      () =>
+        formRef.value.createField({
+          ...props,
+          basePath,
+          ...getRawComponent(props),
+        }),
+      [() => props.name, formRef]
+    )
 
     provide(FieldSymbol, fieldRef)
 
     return () => {
       const field = fieldRef.value
-      return h(
-        ReactiveField, 
-        {
-          props: {
-            field
-          }
+      const componentData = {
+        props: {
+          field,
         },
-        {
-          ...slots,
-          default: () => slots.default && slots.default({
+      }
+      const children = {
+        ...slots,
+      }
+      if (slots.default) {
+        children.default = () =>
+          slots.default({
             field,
-            form: field.form
-          }),
-        }
-      )
+            form: field.form,
+          })
+      }
+      return h(ReactiveField, componentData, children)
     }
-  }
+  },
 }) as unknown as DefineComponent<IFieldProps<VueComponent, VueComponent>>

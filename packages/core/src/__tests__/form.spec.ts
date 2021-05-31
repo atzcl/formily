@@ -925,13 +925,12 @@ test('initialValues merge values before create field', () => {
   expect(arr_0_aa.value).toEqual('321')
 })
 
-
 test('initialValues merge values after create field', () => {
   const form = attach(createForm())
   const aa = attach(
     form.createArrayField({
       name: 'aa',
-      initialValue:'111'
+      initialValue: '111',
     })
   )
   const array = attach(
@@ -951,4 +950,21 @@ test('initialValues merge values after create field', () => {
   expect(array.value).toEqual([{ aa: '321' }])
   expect(arr_0_aa.value).toEqual('321')
   expect(aa.value).toEqual('222')
+})
+
+test('remove property of form values with undefined value', () => {
+  const form = attach(createForm())
+  const field = attach(
+    form.createField({
+      name: 'aaa',
+      initialValue: 123,
+    })
+  )
+  expect(form.values).toMatchObject({ aaa: 123 })
+  field.display = 'none'
+  expect(form.values.hasOwnProperty('aaa')).toBeFalsy()
+  field.display = 'visible'
+  expect(form.values.hasOwnProperty('aaa')).toBeTruthy()
+  field.setValue(undefined)
+  expect(form.values.hasOwnProperty('aaa')).toBeTruthy()
 })

@@ -1,10 +1,10 @@
 {
-  "name": "@formily/designable",
+  "name": "@formily/designable-setters",
   "version": "2.0.0-beta.51",
   "license": "MIT",
   "main": "lib",
   "module": "esm",
-  "umd:main": "dist/formily.designable.umd.production.js",
+  "umd:main": "dist/formily.designable.antd.umd.production.js",
   "unpkg": "dist/formily.designable.umd.production.js",
   "jsdelivr": "dist/formily.designable.umd.production.js",
   "jsnext:main": "esm",
@@ -36,6 +36,7 @@
   "peerDependencies": {
     "@types/react": ">=16.8.0 || >=17.0.0",
     "@types/react-dom": ">=16.8.0 || >=17.0.0",
+    "antd": "^4.0.0",
     "react": ">=16.8.0 || >=17.0.0",
     "react-dom": ">=16.8.0",
     "react-is": ">=16.8.0 || >=17.0.0"

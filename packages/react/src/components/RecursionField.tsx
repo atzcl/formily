@@ -24,9 +24,10 @@ export const RecursionField: React.FC<IRecursionFieldProps> = (props) => {
       ...scope,
     })
   }, [schema])
-  const fieldProps = useMemo(() => fieldSchema?.toFieldProps(options) as any, [
-    fieldSchema,
-  ])
+  const fieldProps = useMemo(
+    () => fieldSchema?.toFieldProps(options) as any,
+    [fieldSchema]
+  )
   const getBasePath = () => {
     if (props.onlyRenderProperties) {
       return props.basePath || parent?.address.concat(props.name)
@@ -89,7 +90,8 @@ export const RecursionField: React.FC<IRecursionFieldProps> = (props) => {
     }
     return (
       <Field {...fieldProps} name={props.name} basePath={basePath}>
-        {fieldSchema['x-content']}
+        {fieldSchema['x-content'] ||
+          fieldSchema['x-component-props']?.['children']}
       </Field>
     )
   }
